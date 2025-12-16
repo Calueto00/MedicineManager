@@ -23,7 +23,7 @@ class DoctorController extends Controller
     {
         try {
             $data = Doctor::findOrFail($id);
-            return response()->json($data->with(['user','schedule','appointments'])->get(),200);
+            return response()->json($data->load(['user','schedules','appointments']),200);
         } catch (\Throwable $th) {
            return response()->json(['error'=>$th->getMessage()]);
         }
@@ -34,7 +34,7 @@ class DoctorController extends Controller
         try {
             $data = $request->validate([
                 'name'=>'required|string|min:3',
-                'email'=>'required|email|unique:user,email',
+                'email'=>'required|email|unique:users,email',
                 'password'=>'required|string',
                 'especiality'=>'required|string|min:3',
                 'crm'=>'nullable|string|min:3',
@@ -67,9 +67,9 @@ class DoctorController extends Controller
             $user = User::findOrFail($id);
             $data = $request->validate([
                 'name'=>'same:name|required|string|min:3',
-                'email'=>'same:email|required|unique:user,email,'.$id,
+                'email'=>'same:email|required|unique:users,email,'.$id,
                 'password'=>'same:password|required|string',
-                'especiality'=>'same::especiality|reqquired|string|min:3',
+                'especiality'=>'same:especiality|required|string|min:3',
                 'crm'=>'same:crm|nullable|string|min:3',
                 'bio'=>'same:bio|string|nullable|min:3'
             ]);
