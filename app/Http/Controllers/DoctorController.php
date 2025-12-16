@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Doctor;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
+class DoctorController extends Controller
+{
+    public function index()
+    {
+        try {
+            $doctor = Doctor::with('user')->get();
+            return response()->json($doctor,200);
+        } catch (\Throwable $th) {
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $data = Doctor::findOrFail($id);
+            return response()->json($data->with(['user','schedule','appointments'])->get(),200);
+        } catch (\Throwable $th) {
+           return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'name'=>'required|string|min:3',
+                'email'=>'required|email|unique:user,email',
+                'password'=>'required|string',
+                'especiality'=>'required|string|min:3',
+                'crm'=>'nullable|string|min:3',
+                'bio'=>'nullable|string|min:3'
+            ]);
+            $user = User::create([
+                'name'=>$data['name'],
+                'email'=>$data['email'],
+                'password'=>Hash::make($data['password']),
+                'role' => 'doctor'
+            ]);
+            $user->doctor()->create([
+                'user_id'=>$user->id,
+                'especiality'=>$data['especiality'],
+                'crm'=>$data['crm'],
+                'bio'=>$data['bio']
+            ]);
+
+            return response()->json([
+                'message'=>'Doctor created successifully',
+                'data'=> $user->load('doctor')
+            ],201);
+        } catch (\Throwable $th) {
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+
+    public function update(Request $request, $id){
+        try {
+            $user = User::findOrFail($id);
+            $data = $request->validate([
+                'name'=>'same:name|required|string|min:3',
+                'email'=>'same:email|required|unique:user,email,'.$id,
+                'password'=>'same:password|required|string',
+                'especiality'=>'same::especiality|reqquired|string|min:3',
+                'crm'=>'same:crm|nullable|string|min:3',
+                'bio'=>'same:bio|string|nullable|min:3'
+            ]);
+            $user->update([
+                'name'=>$data['name'],
+                'email'=>$data['email'],
+                'password'=>Hash::make($data['password'])
+            ]);
+            $user->doctor()->update([
+                'user_id'=>$user->id,
+                'especiality'=>$data['especiality'],
+                'crm'=>$data['crm'],
+                'bio'=>$data['bio']
+            ]);
+
+            return response()->json([
+                'message'=>'Doctor updated successifully',
+                'data'=>$user->load('doctor')
+            ],200);
+        } catch (\Throwable $th) {
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+
+    public function delete($id){
+        try {
+            $data = User::findOrFail($id);
+            $data->delete();
+            return response()->json(['message'=>'Doctor deleted successifully'],200);
+        } catch (\Throwable $th) {
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+}

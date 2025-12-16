@@ -1,0 +1,63 @@
+<?php
+
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\ExamRequestController;
+use App\Http\Controllers\MedicalRecordController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\ScheduleController;
+use App\Models\Patients;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::middleware('auth:sanctum')->group(function(){
+    //====================================
+    //Pacientes
+    //=====================================
+    Route::get('/patients',[PatientController::class, 'index']);
+    Route::post('/patient',[PatientController::class, 'store']);
+    Route::get('/patients/{patients}',[PatientController::class, 'show']);
+    Route::put('/patient/{id}',[PatientController::class, 'update']);
+    Route::delete('/patient/{id}',[PatientController::class, 'delete']);
+
+    //====================================
+    //medicos
+    //=====================================
+
+    Route::get('/doctors',[DoctorController::class, 'index']);
+    Route::post('/doctor',[DoctorController::class, 'store']);
+    Route::get('/doctor/{id}',[DoctorController::class, 'show']);
+    Route::put('/doctor',[DoctorController::class, 'update']);
+    Route::delete('/doctor/{id}',[DoctorController::class, 'delete']);
+
+    //====================================
+    //horarário de medicos
+    //=====================================
+
+    Route::post('/schedule',[ScheduleController::class, 'store']);
+    Route::delete('/schedule/{id}',[ScheduleController::class, 'delete']);
+
+    //====================================
+    // consultas
+    //=====================================
+
+    Route::get('/appointments',[AppointmentController::class, 'index']);
+    Route::get('/appointments/{id}',[AppointmentController::class, 'show']);
+    Route::post('/appointments',[AppointmentController::class, 'store']);
+    Route::put('/appointments/{id}',[AppointmentController::class, 'update']);
+    Route::delete('/appointments/{id}',[AppointmentController::class, 'delete']);
+
+    //====================================
+    // prontuario medico
+    //=====================================
+
+    Route::post('/medical-record',[MedicalRecordController::class, 'store']);
+    Route::put('/medical-record/{id}',[MedicalRecordController::class, 'update']);
+
+    //====================================
+    // pedido de exame
+    //=====================================
+
+    Route::post('/exam-request',[ExamRequestController::class, 'store']);
+});
+
