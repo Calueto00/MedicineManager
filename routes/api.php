@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ExamRequestController;
 use App\Http\Controllers\MedicalRecordController;
@@ -9,6 +10,12 @@ use App\Http\Controllers\ScheduleController;
 use App\Models\Patients;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+//===========================
+// rotas de autenticação
+//============================
+Route::post('/login',[AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware('auth:sanctum')->group(function(){
     //====================================
