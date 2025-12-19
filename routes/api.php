@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login',[AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-Route::middleware('auth:sanctum')->group(function(){
+Route::middleware(['auth:sanctum','role:admin'])->group(function(){
     //====================================
     //Pacientes
     //=====================================
@@ -33,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::get('/doctors',[DoctorController::class, 'index']);
     Route::post('/doctor',[DoctorController::class, 'store']);
-    Route::get('/doctors/{id}',[DoctorController::class, 'show']);
+    Route::get('/doctor/{id}',[DoctorController::class, 'show']);
     Route::put('/doctor/{id}',[DoctorController::class, 'update']);
     Route::delete('/doctor/{id}',[DoctorController::class, 'delete']);
 
