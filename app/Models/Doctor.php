@@ -22,7 +22,7 @@ class Doctor extends Model
     }
 
     public function schedules(){
-        return $this->hasMany(Schedule_Doctor::class);
+        return $this->hasMany(Schedule::class);
     }
 
     public function appointments(){
