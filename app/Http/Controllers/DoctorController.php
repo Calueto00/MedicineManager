@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
 use App\Models\Doctor;
+use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,10 +14,18 @@ class DoctorController extends Controller
     public function index()
     {
         try {
-            $doctor = Doctor::with('user')->get();
+            $doctor = Doctor::with('user')->orderByDesc('created_at')->get();
             return response()->json($doctor,200);
         } catch (\Throwable $th) {
             return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+    public function appointment(){
+        try {
+            $data = Appointment::where('status','agendado')->get();
+            return response()->json($data->load('doctor.user'), 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error'=> $th->getMessage()], 200);
         }
     }
 
@@ -23,7 +33,11 @@ class DoctorController extends Controller
     {
         try {
             $data = Doctor::findOrFail($id);
-            return response()->json($data->load(['user','schedules','appointments']),200);
+            $schedules = Schedule::where('doctor_id',$id)->get();
+            return response()->json([
+                'doctor'=>$data->load(['user','appointments.patient.user']),
+                'schedules'=>$schedules
+            ],200);
         } catch (\Throwable $th) {
            return response()->json(['error'=>$th->getMessage()]);
         }
@@ -37,7 +51,7 @@ class DoctorController extends Controller
                 'email'=>'required|email|unique:users,email',
                 'password'=>'required|string',
                 'especiality'=>'required|string|min:3',
-                'crm'=>'nullable|string|min:3',
+                'c'=>'nullable|string|min:3',
                 'bio'=>'nullable|string|min:3'
             ]);
             $user = User::create([
