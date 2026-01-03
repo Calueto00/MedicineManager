@@ -30,6 +30,6 @@ class Appointment extends Model
     }
 
     public function examRequest(){
-        return $this->hasMany(Exam_Request::class);
+        return $this->hasMany(Exam_Request::class,'appointment');
     }
 }
