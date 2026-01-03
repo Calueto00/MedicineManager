@@ -14,6 +14,9 @@ class PatientController extends Controller
     {
         try {
             $patients = Patients::with('user')->get();
+            if(!$patients) {
+                return response()->json(['message'=>'No patients found'],404);
+            }
             return response()->json($patients, 200);
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage()],401);
@@ -46,17 +49,18 @@ class PatientController extends Controller
             ]);
 
             return response()->json([
-                'data'=>$user,
-                'message'=>'Patient created successfuly'
+                'data'=>'Patient created successfuly'
             ],200);
         } catch (\Throwable $th) {
             return response()->json(['error'=>$th->getMessage()],401);
         }
     }
 
-    public function show(Patients $patients){
+    public function show($id){
         try {
-            return response()->json($patients->load('user'), 200);
+            $data = Patients::with(
+                ['appointments.doctor.user','appointments.medicalRecord','appointments.examRequest','user'])->find($id);
+            return response()->json($data,200);
         } catch (\Throwable $th) {
             return response()->json(['error'=>$th->getMessage()],401);
         }
