@@ -22,8 +22,9 @@ class DoctorController extends Controller
     }
     public function appointment(){
         try {
-            $data = Appointment::where('status','agendado')->get();
-            return response()->json($data->load('doctor.user'), 200);
+            $data = Appointment::where('schedule_id','!=',null)
+                    ->with('schedule.doctor.user')->get();
+            return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json(['error'=> $th->getMessage()], 200);
         }
@@ -32,11 +33,14 @@ class DoctorController extends Controller
     public function show($id)
     {
         try {
-            $data = Doctor::findOrFail($id);
-            $schedules = Schedule::where('doctor_id',$id)->get();
+            $data = Doctor::with([
+                'appointments.patient.user',
+                'appointments',
+                'schedules'
+            ])->findOrFail($id);
             return response()->json([
-                'doctor'=>$data->load(['user','appointments.patient.user']),
-                'schedules'=>$schedules
+                'doctor'=>$data->load('user'),
+
             ],200);
         } catch (\Throwable $th) {
            return response()->json(['error'=>$th->getMessage()]);
