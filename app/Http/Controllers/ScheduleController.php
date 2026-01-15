@@ -22,6 +22,16 @@ class ScheduleController extends Controller
         }
     }
 
+    public function scheduleByDoctor($id){
+        try {
+            $data  = Schedule::where('doctor_id',$id)
+                    ->where('is_available',true)->get();
+                return response()->json($data,200);
+        } catch (\Throwable $th) {
+           return response()->json(['error'=>$th->getMessage()],400);
+        }
+    }
+
     public function show(Request $request, $id){
         try {
             $query = Schedule::query();
