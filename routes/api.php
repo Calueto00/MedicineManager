@@ -43,6 +43,7 @@ Route::middleware(['auth:sanctum','role:admin'])->group(function(){
     //=====================================
     Route::get('/schedules',[ScheduleController::class, 'index']);
     Route::get('/schedule/{id}',[ScheduleController::class, 'show']);
+    Route::get('/schedule/doctor/{id}',[ScheduleController::class, 'scheduleByDoctor']);
     Route::post('/schedule',[ScheduleController::class, 'store']);
     Route::delete('/schedule/{id}',[ScheduleController::class, 'delete']);
 
@@ -52,6 +53,7 @@ Route::middleware(['auth:sanctum','role:admin'])->group(function(){
 
     Route::get('/appointments',[AppointmentController::class, 'index']);
     Route::get('/appointment/{id}',[AppointmentController::class, 'show']);
+    Route::get('/appointment/calendar/{month}',[AppointmentController::class, 'appointmentCalendar']);
     Route::post('/appointment',[AppointmentController::class, 'store']);
     Route::put('/appointments/{id}',[AppointmentController::class, 'update']);
     Route::delete('/appointments/{id}',[AppointmentController::class, 'delete']);
