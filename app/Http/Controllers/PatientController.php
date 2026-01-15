@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
 use App\Models\Patients;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,10 +15,14 @@ class PatientController extends Controller
     {
         try {
             $patients = Patients::with('user')->get();
+            $appointment = Appointment::with('patient.user')->get();
             if(!$patients) {
                 return response()->json(['message'=>'No patients found'],404);
             }
-            return response()->json($patients, 200);
+            return response()->json([
+                'patients'=>$patients,
+                'appointments'=>$appointment
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json(['message'=>$th->getMessage()],401);
         }
