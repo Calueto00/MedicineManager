@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Patients;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -13,6 +14,20 @@ class AppointmentController extends Controller
             return response()->json($appointment,200);
         } catch (\Throwable $th) {
             return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+
+    //search appointment by patient name
+    public function patientAppointmentSearch($name) {
+        try {
+            $patient = $name;
+            $appointments = Appointment::with(['patient.user'])
+                    ->whereHas('patient.user',function ($query) use ($name) {
+                        $query->where('name','LIKE',"%{$name}%");
+                                    })->get();
+                return response()->json($appointments,200);
+        } catch (\Throwable $th) {
+            return response()->json(['message'=>$th->getMessage()]);
         }
     }
 
@@ -41,22 +56,12 @@ class AppointmentController extends Controller
         }
     }
 
-    public function appointmentCalendar(Request $request){
-        try {
-            $month = $request->month;
-            $data = Appointment::where('data','like',`%$month%`)->get();
-            return response()->json($data,200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error'=> $th->getMessage()
-            ],401);
-        }
-    }
+
 
     public function show($id){
         try {
-            $data = Appointment::findOrFail($id);
-            return response()->json($data->load(['medicalRecord','examRequest']),200);
+            $data = Appointment::with(['patient.user','invoice','schedule.doctor.user'])->findOrFail($id);
+            return response()->json($data,200);
         } catch (\Throwable $th) {
            return response()->json(['error'=>$th->getMessage()]);
         }
