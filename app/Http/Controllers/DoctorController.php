@@ -47,6 +47,14 @@ class DoctorController extends Controller
         }
     }
 
+    public function searchName($name){
+        $data = Doctor::with('user')->whereHas('user', function($query) use ($name){
+            $query->where('name','like',"%{$name}%");
+        })->get();
+
+        return response()->json($data,200);
+    }
+
     public function store(Request $request)
     {
         try {
