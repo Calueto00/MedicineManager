@@ -64,12 +64,22 @@ class PatientController extends Controller
     public function show($id){
         try {
             $data = Patients::with(
-                ['appointments.doctor.user','appointments.medicalRecord','appointments.examRequest','user'])->find($id);
+                ['appointments.schedule.doctor.user','user'])->find($id);
             return response()->json($data,200);
         } catch (\Throwable $th) {
             return response()->json(['error'=>$th->getMessage()],401);
         }
     }
+
+    public function searchName($name){
+        $data = Patients::with('user')->whereHas('user',function($query) use ($name){
+            $query->where('name','LIKE',"%{$name}%");
+        })->get();
+
+        return response()->json($data,200);
+    }
+
+
 
     public function update(Request $request, $id){
         try {
